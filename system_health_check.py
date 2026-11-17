@@ -1,7 +1,6 @@
 import shutil
 import psutil
 import time
-import os
 
 
 def uptime(): 
@@ -16,7 +15,8 @@ def diskSpace():
     total_size = round(stat.total / 1e9, 2)
     used_size = round(stat.used / 1e9, 2)
     free_size = round(stat.free / 1e9, 2)
-    return total_size, used_size, free_size
+    percent_size = round((used_size / total_size) * 100)
+    return total_size, used_size, free_size, percent_size
 
 
 def ramUsage():
@@ -28,17 +28,23 @@ def ramUsage():
 
     return ramUsed, ramTotal, ramPercent, ramFree
 
-total_size, used_size, free_size = diskSpace()
-ramUsed, ramTotal, ramPercent, ramFree = ramUsage()
-hours, minutes = uptime()
-
-print(f"Disk total space: {total_size} GB") 
-print(f"Disk used space: {used_size} GB")
-print(f"Disk free space: {free_size} GB")
 
 
-print(f"Ram usage: {ramUsed} / {ramTotal} ({ramPercent}%)")
-print(f"Ram free: {ramFree}")
+if __name__ == "__main__":
 
-print(f"Uptime: {hours}h {minutes}m")
+    total_size, used_size, free_size, percent_size = diskSpace()
+    ramUsed, ramTotal, ramPercent, ramFree = ramUsage()
+    hours, minutes = uptime()
+
+    if percent_size > 90:
+        print("----WARNING YOU ARE ABOVE 90% OF YOUR SIZE----")
+
+    print(f"Disk usage: {used_size} GB / {total_size} GB ({percent_size}%)") 
+    print(f"Disk free space: {free_size} GB")
+
+
+    print(f"Ram usage: {ramUsed} GB / {ramTotal} GB ({ramPercent}%)")
+    print(f"Ram free: {ramFree} GB")
+
+    print(f"Uptime: {hours}h {minutes}m")
 
