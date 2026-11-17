@@ -2,13 +2,6 @@ import shutil
 import psutil
 import time
 
-
-def uptime(): 
-    seconds = int(time.time() - psutil.boot_time())
-    hours, rest = divmod(seconds, 3600)
-    minutes, seconds = divmod(rest, 60)
-    return hours, minutes
-
 def diskSpace():
     path = "/"
     stat = shutil.disk_usage(path)
@@ -28,7 +21,11 @@ def ramUsage():
 
     return ramUsed, ramTotal, ramPercent, ramFree
 
-
+def uptime(): 
+    seconds = int(time.time() - psutil.boot_time())
+    hours, rest = divmod(seconds, 3600)
+    minutes, seconds = divmod(rest, 60)
+    return hours, minutes
 
 if __name__ == "__main__":
 
