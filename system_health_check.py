@@ -1,9 +1,11 @@
 import shutil
 import psutil
 import time
+import argparse
+import os
+import sys
 
-def diskSpace():
-    path = "/"
+def diskSpace(path):
     stat = shutil.disk_usage(path)
     total_size = round(stat.total / 1e9, 2)
     used_size = round(stat.used / 1e9, 2)
@@ -28,17 +30,32 @@ def uptime():
     return hours, minutes
 
 if __name__ == "__main__":
+    def parseArgs():
+        parser = argparse.ArgumentParser(description="Print disk, RAM and uptime of this machine")
+        parser.add_argument("--path", default="/", help="folder whose disk to check (default: /)")
+        parser.add_argument("--limit",type=int, default=90, help="disk percent that triggers a warning (default: 90)")
+        args = parser.parse_args()
+        return args
 
-    total_size, used_size, free_size, percent_size = diskSpace()
+    args = parseArgs()
     ramUsed, ramTotal, ramPercent, ramFree = ramUsage()
     hours, minutes = uptime()
 
-    if percent_size > 90:
-        print("----WARNING YOU ARE ABOVE 90% OF YOUR SIZE----")
+    if os.path.isdir(args.path):
+        total_size, used_size, free_size, percent_size = diskSpace(args.path)
+        if args.limit > 100:
+            sys.exit(f"Error: {args.limit} can't be above 100%")
+        elif args.limit <= 0:
+            sys.exit(f"Error: {args.limit} can't be below 1%")
+        else:
+            if percent_size > args.limit:
+                print(f"----WARNING YOU ARE ABOVE {args.limit}% OF YOUR SIZE----")
 
-    print(f"Disk usage: {used_size} GB / {total_size} GB ({percent_size}%)") 
-    print(f"Disk free space: {free_size} GB")
+        print(f"Disk usage: {used_size} GB / {total_size} GB ({percent_size}%)") 
+        print(f"Disk free space: {free_size} GB")
 
+    else:
+        sys.exit(f"Erros: {args.path} is not a directory")
 
     print(f"Ram usage: {ramUsed} GB / {ramTotal} GB ({ramPercent}%)")
     print(f"Ram free: {ramFree} GB")
